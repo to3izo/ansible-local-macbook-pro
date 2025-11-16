@@ -1,0 +1,16 @@
+---
+- name: Volta がインストールされているか確認
+  stat:
+    path: "{{ ansible_env.HOME }}/.volta/bin/volta"
+  register: volta_check
+
+- name: Volta をインストール
+  shell: curl https://get.volta.sh | bash
+  when: not volta_check.stat.exists
+
+- name: Node.js をインストール (Volta 経由)
+  shell: "{{ ansible_env.HOME }}/.volta/bin/volta install node@lts"
+  args:
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.volta/bin:{{ ansible_env.PATH }}"

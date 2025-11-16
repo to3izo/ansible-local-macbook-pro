@@ -1,0 +1,21 @@
+---
+- name: MacBook Pro セットアップ
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+
+  vars_files:
+    - vars.yml
+    # - vault.yml    # ansible-vault を使用する場合
+
+  vars:
+    # デフォルト値（vars.ymlで上書き可能）
+    ssh_key_comment: "{{ ansible_env.USER }}@{{ ansible_hostname }}"
+
+  roles:
+    - macos_setting  # macOS 初期設定
+    - git
+    - ssh_key
+    - volta          # Node.js も導入
+    - homebrew       # CLI/GUI ツールをまとめて導入
+    - node_modules   # npm と pnpm のグローバルパッケージ

@@ -1,0 +1,48 @@
+---
+- name: SSH鍵ファイル名を設定
+  set_fact:
+    ssh_key_name: "{{ 'id_ed25519_' + ssh_key_prefix if ssh_key_prefix is defined else 'id_ed25519' }}"
+
+- name: SSH鍵ディレクトリの存在確認
+  file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: '0700'
+
+- name: SSH鍵の存在確認
+  stat:
+    path: "{{ ansible_env.HOME }}/.ssh/{{ ssh_key_name }}"
+  register: ssh_key_check
+
+- name: SSH鍵を生成
+  openssh_keypair:
+    path: "{{ ansible_env.HOME }}/.ssh/{{ ssh_key_name }}"
+    type: "ed25519"  # ed25519 で固定
+    comment: "{{ ssh_key_comment | default(ansible_env.USER + '@' + ansible_hostname) }}"
+    state: present
+  when: not ssh_key_check.stat.exists
+
+- name: SSH 公開鍵の内容を読み取り
+  slurp:
+    src: "{{ ansible_env.HOME }}/.ssh/{{ ssh_key_name }}.pub"
+  register: ssh_public_key
+
+- name: SSH 公開鍵を出力
+  debug:
+    msg: "SSH公開鍵: {{ ssh_public_key.content | b64decode }}"
+
+- name: SSH config 設定追加 (GitHub の SSH 接続を自動追記)
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.ssh/config"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - {{ ssh_key_prefix | default('default') }}"
+    block: |
+      Host {{ 'github.com-' + ssh_key_prefix if ssh_key_prefix is defined else 'github.com' }}
+        HostName github.com
+        User git
+        IdentityFile ~/.ssh/{{ ssh_key_name }}
+        IdentitiesOnly yes
+        AddKeysToAgent yes
+        UseKeychain yes
+    create: yes  # .ssh/config が無かったら新規作成
+    mode: '0600'
+  # when: ssh_key_prefix is defined

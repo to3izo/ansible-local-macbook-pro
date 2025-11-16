@@ -1,0 +1,83 @@
+---
+- name: マウスの副ボタンクリックを「右側をクリック」に設定
+  community.general.osx_defaults:
+    domain: com.apple.driver.AppleBluetoothMultitouch.mouse
+    key: MouseButtonMode
+    type: string
+    value: TwoButton
+    state: present
+
+- name: トラックパッドの副ボタンを「二本指でタップ」に設定
+  community.general.osx_defaults:
+    domain: com.apple.driver.AppleBluetoothMultitouch.trackpad
+    key: TrackpadRightClick
+    type: bool
+    value: true
+    state: present
+
+- name: トラックパッドの副ボタンを「二本指でタップ」に設定（内蔵トラックパッド）
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadRightClick
+    type: bool
+    value: true
+    state: present
+
+- name: デスクトップのアイコン配置を「グリッドに沿う」に設定
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: SnapToGrid
+    type: bool
+    value: true
+    state: present
+
+- name: Finder の初期表示をホームディレクトリに設定
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: NewWindowTarget
+    type: string
+    value: PfHm
+    state: present
+
+- name: Finder の初期表示ホームディレクトリのパスを設定
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: NewWindowTargetPath
+    type: string
+    value: "file://{{ ansible_env.HOME }}/"
+    state: present
+
+- name: ファイルの拡張子を常に表示
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleShowAllExtensions
+    type: bool
+    value: true
+    state: present
+
+- name: Finder のパスバーを表示
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowPathbar
+    type: bool
+    value: true
+    state: present
+
+- name: Finder のステータスバーを表示
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowStatusBar
+    type: bool
+    value: true
+    state: present
+
+# ansible-vault で "ansible_become_pass" の設定が必要なステップ
+# - name: ファイアウォールを有効化
+#   become: true
+#   ansible.builtin.command: /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+#   changed_when: false
+
+- name: Finder を再起動して設定を反映
+  ansible.builtin.command: killall Finder
+  changed_when: false
+  failed_when: false

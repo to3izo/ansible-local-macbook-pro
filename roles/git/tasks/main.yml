@@ -1,0 +1,45 @@
+---
+- name: Homebrew がインストールされているか確認
+  stat:
+    path: /opt/homebrew/bin/brew
+  register: homebrew_check
+
+- name: Homebrew をインストール
+  shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not homebrew_check.stat.exists
+
+- name: Gitをインストール (Homebrew 経由)
+  community.general.homebrew:
+    name: git
+    state: present
+
+- name: Git設定ファイルの場所を確認
+  stat:
+    path: "{{ ansible_env.HOME }}/.gitconfig"
+  register: gitconfig_check
+
+- name: Gitユーザー名を設定（未設定の場合）
+  git_config:
+    name: user.name
+    scope: global
+    value: "{{ git_user_name | default('Your Name') }}"
+  when: git_user_name is defined
+
+- name: Gitメールアドレスを設定（未設定の場合）
+  git_config:
+    name: user.email
+    scope: global
+    value: "{{ git_user_email | default('your.email@example.com') }}"
+  when: git_user_email is defined
+
+# - name: Gitのデフォルトブランチ名を設定
+#   git_config:
+#     name: init.defaultBranch
+#     scope: global
+#     value: main
+
+# - name: Gitのエディタを設定
+#   git_config:
+#     name: core.editor
+#     scope: global
+#     value: vim

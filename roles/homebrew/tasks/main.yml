@@ -1,0 +1,51 @@
+---
+- name: Homebrew がインストールされているか確認
+  stat:
+    path: /opt/homebrew/bin/brew
+  register: homebrew_check
+
+- name: Homebrew をインストール
+  shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not homebrew_check.stat.exists
+
+- name: Homebrew パッケージをインストール (Formulae - CLI)
+  community.general.homebrew:
+    name:
+      - gh
+      - podman
+      # - docker  # docker 派の方は podman をコメントアウトしてこちらを利用
+      - uv
+      - ffmpeg
+      - awscli
+      - gemini-cli
+      - codex
+      - ollama
+    state: present
+  become: false
+
+- name: Homebrew アプリケーションをインストール (Cask - GUI)
+  community.general.homebrew_cask:
+    name:
+      - google-chrome
+      - brave-browser
+      - discord
+      - slack
+      - podman-desktop
+      # - docker-desktop  # docker 派の方は podman-desktop をコメントアウトしてこちらを利用
+      - visual-studio-code
+      - cursor
+      - windsurf
+      - zed
+      - android-studio
+      - intellij-idea-ce
+      - warp
+      # - microsoft-office  # Microsoft Office スイートを使う場合
+      - lm-studio
+      - chatgpt
+      - chatgpt-atlas
+      - claude
+      - claude-code
+      - godot
+      # - unity-hub
+    state: present
+  become: false
