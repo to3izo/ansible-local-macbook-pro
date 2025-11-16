@@ -30,6 +30,7 @@
       - brave-browser
       - discord
       - slack
+      - zoom
       - podman-desktop
       # - docker-desktop  # docker 派の方は podman-desktop をコメントアウトしてこちらを利用
       - visual-studio-code

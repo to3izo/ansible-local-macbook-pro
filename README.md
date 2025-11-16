@@ -99,7 +99,7 @@ ansible-playbook setup_macbook.yml
 
 ```bash
 # macOS の初期設定のみ
-ansible-playbook setup_macbook.yml --tags macos
+ansible-playbook setup_macbook.yml --tags macos_setting
 
 # Git のみセットアップ
 ansible-playbook setup_macbook.yml --tags git
