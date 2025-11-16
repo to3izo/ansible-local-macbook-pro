@@ -8,6 +8,23 @@
   shell: curl https://get.volta.sh | bash
   when: not volta_check.stat.exists
 
+- name: Volta の環境変数を zsh 設定ファイルに追加
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.zprofile"
+    block: |
+      # Volta 環境変数設定
+      export VOLTA_HOME="$HOME/.volta"
+      export PATH="$VOLTA_HOME/bin:$PATH"
+    create: true
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Volta"
+  when: not volta_check.stat.exists
+
+- name: .zprofile を読み込んで環境変数を反映
+  shell: source ~/.zprofile
+  args:
+    executable: /bin/zsh
+  when: not volta_check.stat.exists
+
 - name: Node.js をインストール (Volta 経由)
   shell: "{{ ansible_env.HOME }}/.volta/bin/volta install node@lts"
   args:

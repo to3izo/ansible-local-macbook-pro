@@ -37,15 +37,15 @@
       - cursor
       - windsurf
       - zed
-      - android-studio
-      - intellij-idea-ce
+      # - android-studio
+      # - intellij-idea-ce
       - warp
       # - microsoft-office  # Microsoft Office スイートを使う場合
       - lm-studio
       - chatgpt
       - chatgpt-atlas
       - claude
-      - claude-code
+      # - claude-code
       - godot
       # - unity-hub
     state: present
